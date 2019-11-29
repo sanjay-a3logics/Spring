@@ -1,0 +1,32 @@
+Trigger contactTrigger on Contact (after insert,after update,after delete) { 
+    Map<Id, Account> updateAccountMap =new Map<Id, Account>(); 
+    Set<Id> accountIds = new Set<Id>();
+    if(Trigger.isInsert||Trigger.isUpdate){ 
+        for(Contact cont: Trigger.new){ 
+            if(cont.AccountId != null)                
+                accountIds.add(cont.AccountId);             
+        } 
+    } 
+    if(Trigger.isDelete){ 
+        for(Contact cont: Trigger.old){ 
+            if(cont.AccountId != null) 
+                accountIds.add(cont.AccountId);              
+        } 
+    }  
+    
+    if(accountIds.size() > 0){   
+        List<AggregateResult> AggregateResult_ContactList = [select Count(Id) TotalContact, AccountId from Contact where AccountId IN : accountIds group by AccountId]; 
+        if(AggregateResult_ContactList != null && AggregateResult_ContactList.size() > 0){ 
+            for(AggregateResult aggr:AggregateResult_ContactList){             
+                Account acc = new Account(); 
+                acc.Id = (Id)aggr.get('AccountId'); 
+                acc.Number_of_Contacts__c = (Integer)aggr.get('TotalContact');          
+                updateAccountMap.put(acc.Id, acc);            
+            } 
+        }
+     }
+    
+    if(updateAccountMap.size() > 0){   
+        update updateAccountMap.values();  
+    } 
+}
