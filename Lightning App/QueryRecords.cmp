@@ -1,0 +1,24 @@
+<aura:component controller="QueryAccountRecordsController"  implements="flexipage:availableForRecordHome,force:hasRecordId" access="global">
+<aura:handler name="init" action="{!c.getAccountList}" value="{!this}" />
+<aura:attribute name="accountList" type="List"/>
+    
+    <lightning:card title="Account">          
+            <div aura:id="recordViewForm">		
+                <p class="slds-p-horizontal_small">
+                <aura:iteration items="{!v.accountList}" var="account"> 
+                   <table border="1">
+                    <tr>
+                        <td>
+                            {!account.Name}   
+                        </td>
+                        <td>
+                            {!account.CreatedDate}   
+                        </td>                       
+                    </tr>
+                   </table>                                                   
+                </aura:iteration> 
+                </p>   
+            </div>
+    </lightning:card>
+    
+</aura:component>
